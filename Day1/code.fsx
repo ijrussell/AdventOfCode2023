@@ -13,7 +13,7 @@ module Part2 =
         [ "one", 1; "two", 2; "three", 3; "four", 4; "five", 5; "six", 6; "seven", 7; "eight", 8; "nine", 9 ]
         |> dict
 
-let inline buildSeachValues (mapping:IDictionary<string,int>) = 
+let inline buildSearchValues (mapping:IDictionary<string,int>) = 
     let values = mapping.Values |> Seq.map string
     let keys : string seq = mapping.Keys
     Seq.concat [ keys; values ]
@@ -34,7 +34,7 @@ let inline parseLast (seachValues:string seq) (input:string) =
     |> fst 
 
 let parse (mapping:IDictionary<string,int>) =
-    let searchValues = buildSeachValues mapping
+    let searchValues = buildSearchValues mapping
     fun (input:string) ->
         let getValue (input:string) =
             let (success, value) = Int32.TryParse(input)
