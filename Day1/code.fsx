@@ -29,7 +29,6 @@ let inline parseFirst (seachValues:string seq) (input:string) =
 let inline parseLast (seachValues:string seq) (input:string) =
     seachValues
     |> Seq.map (fun item -> item, input.LastIndexOf item)
-    |> Seq.filter (fun item -> snd item >= 0)
     |> Seq.maxBy snd
     |> fst 
 
@@ -44,11 +43,11 @@ let parse (mapping:IDictionary<string,int>) =
         10 * calc parseFirst + calc parseLast
 
 let run (mapping:IDictionary<string,int>) (fileName:string) =
-    Path.Combine(__SOURCE_DIRECTORY__, "AdventOfCode2023", fileName)
+    Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
     |> Array.map (parse mapping)
     |> Array.sum
 
-let part1 = run Part1.mapping "day1-actual.txt" // 55386
+let part1 = run Part1.mapping "actual-data.txt" // 55386
 
-let part2 = run Part2.mapping "day1-actual.txt" // 54824
+let part2 = run Part2.mapping "actual-data.txt" // 54824
