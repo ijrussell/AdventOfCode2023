@@ -4,7 +4,7 @@ open System.Collections.Generic
 
 module Part1 =
     let mapping = 
-        [1-9]
+        [1..9]
         |> List.map (fun item -> string item, item)
         |> dict
 
