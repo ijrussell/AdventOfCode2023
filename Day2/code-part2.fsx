@@ -1,29 +1,29 @@
 open System.IO
 
-let cubes = 
-    [ "red", 12; "green", 13; "blue", 14 ]
-    |> Map.ofList
-
 let parse (mapping:Map<string,int>) (input:string) =
     match input.Split(": ") with
-    | [|game;sets|] -> 
+    | [|_;sets|] -> 
         [|
             for set in sets.Split(";") do
                 for selection in set.Split(",") do
                     match selection.Trim().Split(" ") with
-                    | [|num;col|] -> ( num, col) 
+                    | [|num;col|] -> (num, col) 
                     | _ -> failwith $"Unexpected set {selection}"  
         |]
-        |> Array.forall (fun (num, col) -> int num <= mapping[col])
-        |> fun isValid -> if isValid then Some (game.Substring("Game ".Length) |> int) else None
+        |> Array.groupBy snd
+        |> Array.map (fun (_, items) ->
+            items |> Array.maxBy (fun (num, _) -> int num) |> fst |> int 
+        )
+        |> Array.reduce (*)
     | _ -> failwith $"Not a valid game: {input}"
 
 let run (mapping:Map<string,int>) (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
-    |> Array.choose (parse mapping)
+    |> Array.map (parse mapping)
     |> Array.sum
 
-let part1test = run cubes "test-data-part1.txt"
+let part2test = run cubes "test-data-part1.txt"
 
-let part1 = run cubes "actual-data.txt"
+let part2 = run cubes "actual-data.txt"
+
