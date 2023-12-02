@@ -1,29 +1,27 @@
 open System.IO
 
-let parse (mapping:Map<string,int>) (input:string) =
+let parse (input:string) =
     match input.Split(": ") with
     | [|_;sets|] -> 
         [|
             for set in sets.Split(";") do
                 for selection in set.Split(",") do
                     match selection.Trim().Split(" ") with
-                    | [|num;col|] -> (num, col) 
+                    | [|num;col|] -> (int num, col) 
                     | _ -> failwith $"Unexpected set {selection}"  
         |]
         |> Array.groupBy snd
-        |> Array.map (fun (_, items) ->
-            items |> Array.maxBy (fun (num, _) -> int num) |> fst |> int 
-        )
+        |> Array.map (fun (_, items) -> items |> Array.maxBy fst |> fst |> int)
         |> Array.reduce (*)
     | _ -> failwith $"Not a valid game: {input}"
 
-let run (mapping:Map<string,int>) (fileName:string) =
+let run (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
-    |> Array.map (parse mapping)
+    |> Array.map parse
     |> Array.sum
 
-let part2test = run cubes "test-data-part1.txt"
+let part2test = run "test-data-part1.txt"
 
-let part2 = run cubes "actual-data.txt"
+let part2 = run "actual-data.txt"
 
