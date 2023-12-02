@@ -7,11 +7,11 @@ let parse (input:string) =
             for set in sets.Split(";") do
                 for selection in set.Split(",") do
                     match selection.Trim().Split(" ") with
-                    | [|num;col|] -> (int num, col) 
+                    | [|count;colour|] -> (colour, int count) 
                     | _ -> failwith $"Unexpected set {selection}"  
         |]
-        |> Array.groupBy snd
-        |> Array.map (fun (_, items) -> items |> Array.maxBy fst |> fst |> int)
+        |> Array.groupBy fst
+        |> Array.map (fun (_, items) -> items |> Array.maxBy snd |> snd)
         |> Array.reduce (*)
     | _ -> failwith $"Not a valid game: {input}"
 
