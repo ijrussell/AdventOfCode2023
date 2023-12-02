@@ -14,16 +14,13 @@ module Part2 =
         |> Map.ofList
 
 let parse (mapping:Map<string,int>) (input:string) =
-    let getValue (key:string) =
-        let (success, value) = Int32.TryParse(key)
-        if success then value else mapping[key]
     let matches = [
         for i in 0..input.Length-1 do
             for item in mapping.Keys do
                 if input.Substring(i).StartsWith(item) then (item, i) ]
     let first = matches |> List.minBy snd |> fst
     let last = matches |> List.maxBy snd |> fst
-    (10 * (first |> getValue)) + (last |> getValue)
+    10 * mapping[first] + mapping[last]
 
 let run (mapping:Map<string,int>) (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
