@@ -17,10 +17,8 @@ let findMatches (winners:int list) (chosen:int list) =
     loop [] winners chosen
 
 let parseNumbers (input:string) =
-    input.Trim().Split(" ")
-    |> Array.choose (fun item -> 
-        if String.IsNullOrWhiteSpace item then None 
-        else item.Trim() |> int |> Some)
+    input.Split(" ", StringSplitOptions.RemoveEmptyEntries)
+    |> Array.map (fun item -> item |> int)
     |> Array.sort
     |> Array.toList
 
