@@ -8,9 +8,8 @@ let (|Split|) (on: string) (input: string) =
 let calculateWinners (input:string) =
     match input with
     | Split ":" [ _; Split "|" [ Split " " winners; Split " " chosen ] ] ->
-        winners
-        |> List.filter (fun w -> chosen |> List.contains w)
-        |> List.length
+        Set.intersect (winners |> Set.ofList) (chosen |> Set.ofList)
+        |> Set.count
     | _ -> failwith $"Invalid input: {input}"
 
 let playBonusGames (games:int array) =
