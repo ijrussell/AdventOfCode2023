@@ -24,7 +24,7 @@ let playBonusGames (games:int array) =
         match next with 
         | [] -> acc
         | _ -> next |> processNext |> loop (next @ acc) 
-    loop [] (games |> Array.toList |> List.mapi (fun i _ -> i))
+    loop [] (List.init (games |> Array.length) id)
 
 let loadData (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
