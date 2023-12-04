@@ -1,16 +1,16 @@
 open System
 open System.IO
 
+let (|Split|) (on: string) (input: string) =
+    input.Split(on, StringSplitOptions.RemoveEmptyEntries)
+    |> Array.toList
+
 let calculateWinners (input:string) =
-    match input.Split(":") with
-    | [|_;numbers|] -> 
-        match numbers.Split("|") with
-        | [|winners;chosen|] -> 
-            let mine = chosen.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-            winners.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-            |> Array.filter (fun w -> mine |> Array.contains w)
-            |> Array.length
-        | _ -> failwith $"Invalid input: {input}"
+    match input with
+    | Split ":" [ _; Split "|" [ Split " " winners; Split " " chosen ] ] ->
+        winners
+        |> List.filter (fun w -> chosen |> List.contains w)
+        |> List.length
     | _ -> failwith $"Invalid input: {input}"
 
 let playBonusGames (games:int array) =
