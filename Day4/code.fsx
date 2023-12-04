@@ -34,7 +34,7 @@ let parse (input:string) =
         | _ -> failwith $"Invalid input: {input}"
     | _ -> failwith $"Invalid input: {input}"
 
-let zzz (games:int array) =
+let playBonusGames (games:int array) =
     let rec loop acc next =
         match next with 
         | [] -> acc
@@ -59,7 +59,7 @@ let runPart2 (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
     |> Array.map parse
-    |> zzz
+    |> playBonusGames
     |> List.length 
     // |> List.groupBy id
     // |> List.map (fun (id, items) -> id+1, items |> List.length)   
