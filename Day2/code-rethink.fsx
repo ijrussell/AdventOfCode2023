@@ -19,9 +19,10 @@ let maxValues =
 let parse (input:string) =
     match input with 
     | Split ":" [ Split " " [ _; Int gameId ]; sets] -> 
-        sets.Split(";", StringSplitOptions.RemoveEmptyEntries)
-        |> Array.collect (fun set -> set.Split(",", StringSplitOptions.RemoveEmptyEntries))
-        |> Array.fold (fun acc selection ->
+        sets
+        |> (|Split|) ";"
+        |> List.collect (fun set -> set |> (|Split|) ",")
+        |> List.fold (fun acc selection ->
             match selection with
             | Split " " [Int qty; colour] -> 
                 match colour with
