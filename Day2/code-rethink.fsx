@@ -16,20 +16,23 @@ let maxValues =
     [ "red", 12; "green", 13; "blue", 14 ]
     |> Map.ofList
 
+let splitPart (acc:GameData) (input:string) =
+    match input with
+    | Split " " [Int qty; colour] -> 
+        match colour with
+        | "red" when qty > acc.MaxRed -> { acc with MaxRed = qty }
+        | "blue" when qty > acc.MaxBlue -> { acc with MaxBlue = qty }
+        | "green" when qty > acc.MaxGreen -> { acc with MaxGreen = qty }
+        | _ -> acc
+    | _ -> failwith $"Unexpected set {input}"  
+
 let parse (input:string) =
     match input with 
     | Split ":" [ Split " " [ _; Int gameId ]; Split ";" sets] -> 
         sets
         |> List.collect (fun set -> set |> (|Split|) ",")
-        |> List.fold (fun acc selection ->
-            match selection with
-            | Split " " [Int qty; colour] -> 
-                match colour with
-                | "red" when qty > acc.MaxRed -> { acc with MaxRed = qty }
-                | "blue" when qty > acc.MaxBlue -> { acc with MaxBlue = qty }
-                | "green" when qty > acc.MaxGreen -> { acc with MaxGreen = qty }
-                | _ -> acc
-            | _ -> failwith $"Unexpected set {selection}"  
+        |> List.fold (fun acc part -> 
+            splitPart acc part
         ) { Id = gameId; MaxBlue = 0; MaxRed = 0; MaxGreen = 0 }
     | _ -> failwith $"Not a valid game: {input}"
 
