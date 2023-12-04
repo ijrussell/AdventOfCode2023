@@ -17,11 +17,9 @@ let playBonusGames (games:int array) =
     let processNext (next:int list) =
         next
         |> List.collect (fun game->
-            let bonus = games[game]
-            match bonus with
+            match games[game] with
             | 0 -> []
-            | _ -> [game+1..game+bonus]
-        )
+            | bonus -> [game+1..game+bonus])
     let rec loop acc next =
         match next with 
         | [] -> acc
