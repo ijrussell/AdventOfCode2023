@@ -17,7 +17,7 @@ let findMatches (winners:int list) (chosen:int list) =
     loop [] winners chosen
 
 let parseNumbers (input:string) =
-    input.Split(" ")
+    input.Trim().Split(" ")
     |> Array.choose (fun item -> 
         if String.IsNullOrWhiteSpace item then None 
         else item.Trim() |> int |> Some)
@@ -29,7 +29,7 @@ let parse (input:string) =
     | [|_;numbers|] -> 
         match numbers.Split("|") with
         | [|winners;chosen|] -> 
-            findMatches (winners.Trim() |> parseNumbers) (chosen.Trim() |> parseNumbers)
+            findMatches (winners |> parseNumbers) (chosen |> parseNumbers)
             |> List.length
         | _ -> failwith $"Invalid input: {input}"
     | _ -> failwith $"Invalid input: {input}"
@@ -49,20 +49,21 @@ let playBonusGames (games:int array) =
             |> loop (next @ acc) 
     loop [] (games |> Array.toList |> List.mapi (fun i _ -> i))
 
-let runPart1 (fileName:string) =
+let loadData (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
-    |> Array.map parse
+    |> Array.map parse 
+
+let runPart1 (fileName:string) =
+    fileName
+    |> loadData 
     |> Array.sumBy (fun len -> pown 2 (len-1))
 
 let runPart2 (fileName:string) =
-    Path.Combine(__SOURCE_DIRECTORY__, fileName)
-    |> File.ReadAllLines
-    |> Array.map parse
+    fileName
+    |> loadData 
     |> playBonusGames
     |> List.length 
-    // |> List.groupBy id
-    // |> List.map (fun (id, items) -> id+1, items |> List.length)   
 
 let part1test = runPart1 "test-data.txt"
 
