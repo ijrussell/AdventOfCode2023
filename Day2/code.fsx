@@ -1,21 +1,39 @@
+open System
 open System.IO
+
+let (|Split|) (on: string) (input: string) =
+    input.Split(on, StringSplitOptions.RemoveEmptyEntries)
+    |> Array.toList
+
+let (|Int|_|) (s: string) =
+    match Int32.TryParse s with
+    | true, n -> Some(Int n)
+    | false, _ -> None
 
 let cubes = 
     [ "red", 12; "green", 13; "blue", 14 ]
     |> Map.ofList
 
+let inline readSelections (input:string list) =
+    input
+    |> List.collect (fun selection ->
+        match selection with
+        | Split "," parts -> 
+            parts
+            |> List.map (fun part ->
+                match part with
+                | Split " " [Int value; colour] -> (value, colour)
+                | _ -> failwith $"Unexpected part {part}"
+            )  
+    ) 
+
 let parse (mapping:Map<string,int>) (input:string) =
-    match input.Split(": ") with
-    | [|game;sets|] -> 
-        [|
-            for set in sets.Split(";") do
-                for selection in set.Split(",") do
-                    match selection.Trim().Split(" ") with
-                    | [|num;col|] -> ( num, col) 
-                    | _ -> failwith $"Unexpected set {selection}"  
-        |]
-        |> Array.forall (fun (num, col) -> int num <= mapping[col])
-        |> fun isValid -> if isValid then Some (game.Substring("Game ".Length) |> int) else None
+    match input with
+    | Split ":" [ Split " " [_; Int gameId]; Split ";" selections] -> 
+        selections
+        |> readSelections
+        |> List.exists (fun (value, colour) -> value > mapping[colour])
+        |> fun isInvalid -> if isInvalid then None else Some gameId
     | _ -> failwith $"Not a valid game: {input}"
 
 let run (mapping:Map<string,int>) (fileName:string) =

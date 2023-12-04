@@ -1,28 +1,36 @@
+open System
 open System.IO
 
 type GameData = { Id:int; MaxRed:int; MaxBlue:int; MaxGreen:int }
+
+let (|Split|) (on: string) (input: string) =
+    input.Split(on, StringSplitOptions.RemoveEmptyEntries)
+    |> Array.toList
+
+let (|Int|_|) (s: string) =
+    match Int32.TryParse s with
+    | true, n -> Some(Int n)
+    | false, _ -> None
 
 let maxValues = 
     [ "red", 12; "green", 13; "blue", 14 ]
     |> Map.ofList
 
 let parse (input:string) =
-    match input.Split(": ") with
-    | [|game;sets|] -> 
-        let id = game.Substring("Game ".Length) |> int
-        sets.Split(";")
-        |> Array.collect (fun set -> set.Split(","))
+    match input with 
+    | Split ":" [ Split " " [ _; Int gameId ]; sets] -> 
+        sets.Split(";", StringSplitOptions.RemoveEmptyEntries)
+        |> Array.collect (fun set -> set.Split(",", StringSplitOptions.RemoveEmptyEntries))
         |> Array.fold (fun acc selection ->
-            match selection.Trim().Split(" ") with
-            | [|quantity;colour|] -> 
-                let qty = int quantity
+            match selection with
+            | Split " " [Int qty; colour] -> 
                 match colour with
                 | "red" when qty > acc.MaxRed -> { acc with MaxRed = qty }
                 | "blue" when qty > acc.MaxBlue -> { acc with MaxBlue = qty }
                 | "green" when qty > acc.MaxGreen -> { acc with MaxGreen = qty }
                 | _ -> acc
             | _ -> failwith $"Unexpected set {selection}"  
-        ) { Id = id; MaxBlue = 0; MaxRed = 0; MaxGreen = 0 }
+        ) { Id = gameId; MaxBlue = 0; MaxRed = 0; MaxGreen = 0 }
     | _ -> failwith $"Not a valid game: {input}"
 
 let validate (data:GameData) =
@@ -35,15 +43,19 @@ let validate (data:GameData) =
 let calculateProduct (data:GameData) =
     data.MaxBlue * data.MaxGreen * data.MaxRed
 
-let runPart1 (fileName:string) =
+let readData (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
+
+let runPart1 (fileName:string) =
+    fileName
+    |> readData
     |> Array.choose (parse >> validate)
     |> Array.sum
 
 let runPart2 (fileName:string) =
-    Path.Combine(__SOURCE_DIRECTORY__, fileName)
-    |> File.ReadAllLines
+    fileName
+    |> readData
     |> Array.map (parse >> calculateProduct)
     |> Array.sum
 
