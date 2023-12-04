@@ -1,34 +1,15 @@
 open System
 open System.IO
 
-let (|LessThan|Match|GreaterThan|) (first:int list, second:int list) =
-    match first, second with
-    | hw::_, hc::_ when hc = hw -> Match
-    | hw::_, hc::_c when hc < hw -> LessThan
-    | _ -> GreaterThan
-
-let findMatches (winners:int list) (chosen:int list) =
-    let rec loop acc remW remC =
-        match remW, remC with
-        | [], _ | _, [] -> acc
-        | Match -> loop (remW.Head::acc) remW.Tail remC.Tail
-        | LessThan -> loop acc remW remC.Tail
-        | GreaterThan -> loop acc remW.Tail remC
-    loop [] winners chosen
-
-let parseNumbers (input:string) =
-    input.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-    |> Array.map (fun item -> item |> int)
-    |> Array.sort
-    |> Array.toList
-
 let parse (input:string) =
     match input.Split(":") with
     | [|_;numbers|] -> 
         match numbers.Split("|") with
         | [|winners;chosen|] -> 
-            findMatches (winners |> parseNumbers) (chosen |> parseNumbers)
-            |> List.length
+            let mine = chosen.Split(" ", StringSplitOptions.RemoveEmptyEntries)
+            winners.Split(" ", StringSplitOptions.RemoveEmptyEntries)
+            |> Array.filter (fun w -> mine |> Array.contains w)
+            |> Array.length
         | _ -> failwith $"Invalid input: {input}"
     | _ -> failwith $"Invalid input: {input}"
 
