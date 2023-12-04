@@ -1,7 +1,7 @@
 open System
 open System.IO
 
-let parse (input:string) =
+let calculateWinners (input:string) =
     match input.Split(":") with
     | [|_;numbers|] -> 
         match numbers.Split("|") with
@@ -14,22 +14,22 @@ let parse (input:string) =
     | _ -> failwith $"Invalid input: {input}"
 
 let playBonusGames (games:int array) =
-    let processNext (next:int list) =
-        next
+    let determineBonusGames (input:int list) =
+        input
         |> List.collect (fun game->
             match games[game] with
             | 0 -> []
             | bonus -> [game+1..game+bonus])
-    let rec loop acc next =
-        match next with 
-        | [] -> acc
-        | _ -> next |> processNext |> loop (next @ acc) 
+    let rec loop acc currentGames =
+        match currentGames with 
+        | [] -> acc |> List.length
+        | _ -> currentGames |> determineBonusGames |> loop (currentGames @ acc) 
     loop [] (List.init (games |> Array.length) id)
 
 let loadData (fileName:string) =
     Path.Combine(__SOURCE_DIRECTORY__, fileName)
     |> File.ReadAllLines
-    |> Array.map parse 
+    |> Array.map calculateWinners 
 
 let runPart1 (fileName:string) =
     fileName
@@ -40,7 +40,6 @@ let runPart2 (fileName:string) =
     fileName
     |> loadData 
     |> playBonusGames
-    |> List.length 
 
 let part1test = runPart1 "test-data.txt"
 
