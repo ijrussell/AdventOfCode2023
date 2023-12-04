@@ -18,9 +18,8 @@ let maxValues =
 
 let parse (input:string) =
     match input with 
-    | Split ":" [ Split " " [ _; Int gameId ]; sets] -> 
+    | Split ":" [ Split " " [ _; Int gameId ]; Split ";" sets] -> 
         sets
-        |> (|Split|) ";"
         |> List.collect (fun set -> set |> (|Split|) ",")
         |> List.fold (fun acc selection ->
             match selection with
